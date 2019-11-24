@@ -1,0 +1,13 @@
+.vscode
+.gitignore
+
+client
+
+tsconfig.AICoder
+tslint.AICoder
+
+out/*.map
+
+package.AICoder
+package-lock.AICoder
+
