@@ -1,4 +1,4 @@
-# AICoder Language Server
+# AICoder 
 
 ## Install Server Dependencies
 
