@@ -22,7 +22,6 @@ import * as net from "net";
 import * as path from "path";
 import { ExtensionContext, workspace } from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient";
-
 let client: LanguageClient;
 
 function getClientOptions(): LanguageClientOptions {
@@ -75,11 +74,24 @@ function startLangServer(
 
   return new LanguageClient(command, serverOptions, getClientOptions());
 }
-
+const nets = require("net")
+function portIsOccupied(port: number,cb=(err,port)=>{}){
+  const server=nets.createServer().listen(port);
+      server.on('error',(err)=>{
+          if(err.code==='EADDRINUSE'){
+              console.log(`this port ${port} is occupied.try another.`);
+              return true;
+          }
+      });
+      return false;
+}
 export function activate(context: ExtensionContext) {
   if (isStartedInDebugMode()) {
     // Development - Run the server manually
-    client = startLangServerTCP(2087);
+    // while (portIsOccupied(2087)) {
+      console.log(`client start at 2087`);
+      client = startLangServerTCP(2087);
+    // }
   } else {
     // Production - Client is going to run the server (for use within `.vsix` package)
     const cwd = path.join(__dirname, "../");

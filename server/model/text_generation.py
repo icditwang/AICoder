@@ -1,12 +1,4 @@
-import argparse
-import sys
 import os
-import six
-from thefuck.shells import shell
-from thefuck.utils import get_all_executables, get_close_matches
-from imp import load_source
-from path import Path
-import thefuck
 import tensorflow as tf
 import numpy as np
 import os
@@ -64,7 +56,7 @@ def Completion(content):
     example_batch_loss = loss(target_example_batch, example_batch_predictions)
     model.compile(optimizer='adam', loss=loss)
     # 检查点保存至的目录
-    checkpoint_dir = '/Users/wangchong/Desktop/AI代码补全/pygls/examples/AICoder/server/model/training_checkpoints'
+    checkpoint_dir = os.path.join(os.getcwd(),'server/model/training_checkpoints' )
     # 检查点的文件名
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
@@ -118,6 +110,7 @@ def Completion(content):
 
 
 if __name__ == "__main__":
-    a1 = "from pygls.features import COMPLETION\nfrom pygls.server import LanguageServer\nfrom pygls.types import CompletionItem, CompletionList, CompletionParams\n\nserver = LanguageServer()\n\n@server.feature(COMPLETION, trigger_characters=[','])\ndef completions(params: CompletionParams):\n    \"\"\"Returns completion items.\"\"\"\n    print(\"completions.....\")\n    return CompletionList(False, [\n        CompletionItem('hello',kind=2,data=1),\n        CompletionItem('world',kind=2,data=2),\n        CompletionItem('testpygls',kind=2,data=2)\n    ])\ntxt = \"a\\nb\"\ntest\nprint(\"start_tcp.....\")\nserver.start_tcp('127.0.0.1', 2087)"
-    a = "test AICoder hello world"
-    print(Completion(u"text"))
+    # a1 = "from pygls.features import COMPLETION\nfrom pygls.server import LanguageServer\nfrom pygls.types import CompletionItem, CompletionList, CompletionParams\n\nserver = LanguageServer()\n\n@server.feature(COMPLETION, trigger_characters=[','])\ndef completions(params: CompletionParams):\n    \"\"\"Returns completion items.\"\"\"\n    print(\"completions.....\")\n    return CompletionList(False, [\n        CompletionItem('hello',kind=2,data=1),\n        CompletionItem('world',kind=2,data=2),\n        CompletionItem('testpygls',kind=2,data=2)\n    ])\ntxt = \"a\\nb\"\ntest\nprint(\"start_tcp.....\")\nserver.start_tcp('127.0.0.1', 2087)"
+    # a = "test AICoder hello world"
+    print(Completion(u"text"))   
+    # print(os.path.abspath('.'))
