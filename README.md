@@ -2,6 +2,8 @@
 
 ## Install Server Dependencies
 
+Search AICoder in the vscode and install it or take following method.
+
 1. Install `pygls` following this [README](https://github.com/openlawlibrary/pygls)
 1. Create `.vscode/settings.AICoder` file and set `python.pythonPath` to point to your python environment where `pygls` is installed
 
