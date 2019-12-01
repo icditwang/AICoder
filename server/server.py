@@ -34,7 +34,8 @@ from .model.text_generation import Completion
 
 COUNT_DOWN_START_IN_SECONDS = 10
 COUNT_DOWN_SLEEP_IN_SECONDS = 1
-
+context = ""
+check = 0
 
 class AILanguageServer(LanguageServer):
     CMD_COUNT_DOWN_BLOCKING = 'countDownBlocking'
@@ -65,11 +66,6 @@ def _validate(ls, params):
     # ls.publish_diagnostics(text_doc.uri, diagnostics)
 
 
-
-context = ""
-check = 0
-# def test_Completion(content):
-
 @AI_coder.feature(COMPLETION, trigger_characters=[','])
 def completions(ls,params: CompletionParams = None):
     """Returns completion items."""
@@ -83,43 +79,22 @@ def completions(ls,params: CompletionParams = None):
     ls.show_message_log("check_contexts:{}".format(context))
     return CompletionList(False, [
         #CompletionItem(context),
-        CompletionItem('aicoder'),
+        CompletionItem(label='aicoder',detail="AICoder",documentation='aicoder'),
         # CompletionItem('world'),
-        CompletionItem('test_AICoder'),
-        CompletionItem(context)
+        CompletionItem('test_AICoder',detail="AICoder",documentation='test_AICoder'),
+        CompletionItem(label=context,detail="AICoder",documentation=context)
     ])
 
 
-@AI_coder.command(AILanguageServer.CMD_COUNT_DOWN_BLOCKING)
-def count_down_10_seconds_blocking(ls, *args):
-    """Starts counting down and showing message synchronously.
-    It will `block` the main thread, which can be tested by trying to show
-    completion items.
-    """
-    for i in range(COUNT_DOWN_START_IN_SECONDS):
-        ls.show_message('Counting down... {}'
-                        .format(COUNT_DOWN_START_IN_SECONDS - i))
-        time.sleep(COUNT_DOWN_SLEEP_IN_SECONDS)
-
-
-@AI_coder.command(AILanguageServer.CMD_COUNT_DOWN_NON_BLOCKING)
-async def count_down_10_seconds_non_blocking(ls, *args):
-    """Starts counting down and showing message asynchronously.
-    It won't `block` the main thread, which can be tested by trying to show
-    completion items.
-    """
-    for i in range(COUNT_DOWN_START_IN_SECONDS):
-        ls.show_message('Counting down... {}'
-                        .format(COUNT_DOWN_START_IN_SECONDS - i))
-        await asyncio.sleep(COUNT_DOWN_SLEEP_IN_SECONDS)
 
 
 def get_change_word(txt,i):
     p = i
     while p>=0 and txt[p] != " ":
         p -= 1
-    return txt[p:i+1]
-
+    return txt[p+1:i+1]
+def test(word):
+    return word+"test"
 @AI_coder.feature(TEXT_DOCUMENT_DID_CHANGE)
 def did_change(ls, params: DidChangeTextDocumentParams):
     """Text document did change notification."""
@@ -136,24 +111,29 @@ def did_change(ls, params: DidChangeTextDocumentParams):
     change_end_position.append(params.contentChanges[0].range.end.character)
     text_doc = ls.workspace.get_document(params.textDocument.uri)
     file_content = text_doc.source
+    ls.show_message_log("change_position: {},{},{},{}".format(change_start_position[0],change_start_position[1],change_end_position[0],change_end_position[1]))
     split = file_content.split('\n')
     changed_line_content = split[change_start_position[0]]
-    change_world = get_change_word(changed_line_content,change_end_position[1])
-    # ls.show_message_log("change_position_is: {},{},{},{}".format(change_start_position[0],change_start_position[1],change_end_position[0],change_end_position[1]))
+    ls.show_message_log("changed_line_content: {}".format(changed_line_content))
+    if change_start_position[1] < change_end_position[1]:
+        p = change_start_position[1]-1
+    else:
+        p = change_start_position[1]
+    change_world = get_change_word(changed_line_content,p)
+
     # ls.show_message_log("file_change_content_is: {}".format(file_change_content))
     # ls.show_message_log("file_content: {}".format(file_content))
-    
-    ls.show_message_log("changed_line_content: {}".format(changed_line_content))
     ls.show_message_log("change_world---:{}".format(change_world))
     print("change_world---:{}".format(change_world))
     global context
     # global check
     # check = 0
-    context = Completion(change_world)
+    # context = Completion(change_world)
+    context = test(change_world)
     # check = 1
     print("contexts---:{}".format(context))
     ls.show_message_log("contexts---:{}".format(context))
-
+    # completions()
     # _validate(ls, params)
 
 
@@ -251,6 +231,6 @@ async def unregister_completions(ls: AILanguageServer, *args):
         ls.show_message('Error happened during completions unregistration.',
                         MessageType.Error)
 
-# if __name__ == '__main__':
-#     text = Completion("text")
-#     print(text)
+if __name__ == '__main__':
+    text = Completion("text")
+    print(text)

@@ -67,8 +67,8 @@ def Completion(content):
     EPOCHS = 6
 
     model = build_model(vocab_size, embedding_dim, rnn_units, batch_size=1)
-
     model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
+
     # model.load_weights(checkpoint_dir)
     model.build(tf.TensorShape([1, None]))
 

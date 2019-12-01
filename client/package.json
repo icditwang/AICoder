@@ -4,10 +4,10 @@
   "author": "Open Law Library",
   "license": "Apache-2.0",
   "version": "0.8.1",
-  "publisher": "openlawlibrary",
+  "publisher": "icditwang",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openlawlibrary/pygls"
+    "url": "https://github.com/icditwang/AICoder"
   },
   "engines": {
     "vscode": "^1.33.1"

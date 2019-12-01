@@ -74,17 +74,6 @@ function startLangServer(
 
   return new LanguageClient(command, serverOptions, getClientOptions());
 }
-const nets = require("net")
-function portIsOccupied(port: number,cb=(err,port)=>{}){
-  const server=nets.createServer().listen(port);
-      server.on('error',(err)=>{
-          if(err.code==='EADDRINUSE'){
-              console.log(`this port ${port} is occupied.try another.`);
-              return true;
-          }
-      });
-      return false;
-}
 export function activate(context: ExtensionContext) {
   if (isStartedInDebugMode()) {
     // Development - Run the server manually
