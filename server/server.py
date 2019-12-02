@@ -28,7 +28,7 @@ from pygls.types import (CompletionItem, CompletionList, CompletionParams,
                          MessageType, Position, Range, Registration,
                          RegistrationParams, Unregistration,
                          UnregistrationParams)
-
+ 
 # from __future__ import absolute_import, division, print_function, unicode_literals
 from .model.text_generation import Completion
 
@@ -45,38 +45,22 @@ class AILanguageServer(LanguageServer):
     CMD_SHOW_CONFIGURATION_CALLBACK = 'showConfigurationCallback'
     CMD_SHOW_CONFIGURATION_THREAD = 'showConfigurationThread'
     CMD_UNREGISTER_COMPLETIONS = 'unregisterCompletions'
-
+    
     CONFIGURATION_SECTION = 'AICoderServer'
-
+ 
     def __init__(self):
         super().__init__()
 
-
 AI_coder = AILanguageServer()
 
-def _validate(ls, params):
-    ls.show_message_log('Validating file...')
-
-    text_doc = ls.workspace.get_document(params.textDocument.uri)
-    
-    source = text_doc.source
-    print("source",source)
-    # diagnostics = _validate_AICoder(ls,source) if source else []
-
-    # ls.publish_diagnostics(text_doc.uri, diagnostics)
-
-
-@AI_coder.feature(COMPLETION, trigger_characters=[','])
+@AI_coder.feature(COMPLETION, trigger_characters=[chr(i) for i in range(33,127)])
 def completions(ls,params: CompletionParams = None):
     """Returns completion items."""
     print("completions")
-    ls.show_message_log("completions")
+    ls.show_message_log('completions')
     global context
     global check
-    # if check == 1:   
-    # context = Completion("test")
     print("check_contexts:{}".format(context))
-    ls.show_message_log("check_contexts:{}".format(context))
     return CompletionList(False, [
         #CompletionItem(context),
         CompletionItem(label='aicoder',detail="AICoder",documentation='aicoder'),
@@ -84,10 +68,6 @@ def completions(ls,params: CompletionParams = None):
         CompletionItem('test_AICoder',detail="AICoder",documentation='test_AICoder'),
         CompletionItem(label=context,detail="AICoder",documentation=context)
     ])
-
-
-
-
 def get_change_word(txt,i):
     p = i
     while p>=0 and txt[p] != " ":
@@ -99,9 +79,7 @@ def test(word):
 def did_change(ls, params: DidChangeTextDocumentParams):
     """Text document did change notification."""
     print("did_change")
-    ls.show_message_log("did_change")
-    # a = Object(textDocument=Object(uri='file:///Users/wangchong/Desktop/AI%E4%BB%A3%E7%A0%81%E8%A1%A5%E5%85%A8/test.py', version=10), contentChanges=[Object(range=Object(start=Object(line=1, character=24), end=Object(line=1, character=26)), rangeLength=2, text='te')])
-    # ls.show_message_log("param_is: {}".format(params))
+    ls.show_message_log('did_change')
     file_change_content = params.contentChanges[0].text
     change_start_position = []
     change_end_position = []
@@ -111,10 +89,10 @@ def did_change(ls, params: DidChangeTextDocumentParams):
     change_end_position.append(params.contentChanges[0].range.end.character)
     text_doc = ls.workspace.get_document(params.textDocument.uri)
     file_content = text_doc.source
-    ls.show_message_log("change_position: {},{},{},{}".format(change_start_position[0],change_start_position[1],change_end_position[0],change_end_position[1]))
+    print("change_position: {},{},{},{}".format(change_start_position[0],change_start_position[1],change_end_position[0],change_end_position[1]))
     split = file_content.split('\n')
     changed_line_content = split[change_start_position[0]]
-    ls.show_message_log("changed_line_content: {}".format(changed_line_content))
+    print("changed_line_content: {}".format(changed_line_content))
     if change_start_position[1] < change_end_position[1]:
         p = change_start_position[1]-1
     else:
@@ -123,19 +101,11 @@ def did_change(ls, params: DidChangeTextDocumentParams):
 
     # ls.show_message_log("file_change_content_is: {}".format(file_change_content))
     # ls.show_message_log("file_content: {}".format(file_content))
-    ls.show_message_log("change_world---:{}".format(change_world))
     print("change_world---:{}".format(change_world))
     global context
-    # global check
-    # check = 0
     # context = Completion(change_world)
     context = test(change_world)
-    # check = 1
     print("contexts---:{}".format(context))
-    ls.show_message_log("contexts---:{}".format(context))
-    # completions()
-    # _validate(ls, params)
-
 
 @AI_coder.feature(TEXT_DOCUMENT_DID_CLOSE)
 def did_close(server: AILanguageServer, params: DidCloseTextDocumentParams):
@@ -161,44 +131,6 @@ async def register_completions(ls: AILanguageServer, *args):
     else:
         ls.show_message('Error happened during completions registration.',
                         MessageType.Error)
-
-
-@AI_coder.command(AILanguageServer.CMD_SHOW_CONFIGURATION_ASYNC)
-async def show_configuration_async(ls: AILanguageServer, *args):
-    """Gets exampleConfiguration from the client settings using coroutines."""
-    try:
-        config = await ls.get_configuration_async(ConfigurationParams([
-            ConfigurationItem('', AILanguageServer.CONFIGURATION_SECTION)
-        ]))
-
-        example_config = config[0].exampleConfiguration
-
-        ls.show_message(
-            'AICoderServer.exampleConfiguration value: {}'.format(example_config)
-        )
-
-    except Exception as e:
-        ls.show_message_log('Error ocurred: {}'.format(e))
-
-
-@AI_coder.command(AILanguageServer.CMD_SHOW_CONFIGURATION_CALLBACK)
-def show_configuration_callback(ls: AILanguageServer, *args):
-    """Gets exampleConfiguration from the client settings using callback."""
-    def _config_callback(config):
-        try:
-            example_config = config[0].exampleConfiguration
-
-            ls.show_message(
-                'AICoderServer.exampleConfiguration value: {}'
-                .format(example_config)
-            )
-
-        except Exception as e:
-            ls.show_message_log('Error ocurred: {}'.format(e))
-
-    ls.get_configuration(ConfigurationParams([
-        ConfigurationItem('', AILanguageServer.CONFIGURATION_SECTION)
-    ]), _config_callback)
 
 
 @AI_coder.thread()

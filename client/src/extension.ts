@@ -43,6 +43,18 @@ function getClientOptions(): LanguageClientOptions {
   };
 }
 
+function startLangServer(
+  command: string, args: string[], cwd: string,
+): LanguageClient {
+  const serverOptions: ServerOptions = {
+    args,
+    command,
+    options: { cwd },
+  };
+
+  return new LanguageClient(command, serverOptions, getClientOptions());
+}
+
 function isStartedInDebugMode(): boolean {
   return process.env.VSCODE_DEBUG_MODE === "true";
 }
@@ -62,25 +74,10 @@ function startLangServerTCP(port: number): LanguageClient {
 
   return new LanguageClient(`tcp lang server (port ${port})`, serverOptions, getClientOptions());
 }
-
-function startLangServer(
-  command: string, args: string[], cwd: string,
-): LanguageClient {
-  const serverOptions: ServerOptions = {
-    args,
-    command,
-    options: { cwd },
-  };
-
-  return new LanguageClient(command, serverOptions, getClientOptions());
-}
 export function activate(context: ExtensionContext) {
   if (isStartedInDebugMode()) {
     // Development - Run the server manually
-    // while (portIsOccupied(2087)) {
-      console.log(`client start at 2087`);
-      client = startLangServerTCP(2087);
-    // }
+    client = startLangServerTCP(2087);
   } else {
     // Production - Client is going to run the server (for use within `.vsix` package)
     const cwd = path.join(__dirname, "../");
@@ -95,7 +92,6 @@ export function activate(context: ExtensionContext) {
 
   context.subscriptions.push(client.start());
 }
-
 export function deactivate(): Thenable<void> {
   if (!client) {
     return undefined;
