@@ -28,15 +28,20 @@ from pygls.types import (CompletionItem, CompletionList, CompletionParams,
                          MessageType, Position, Range, Registration,
                          RegistrationParams, Unregistration,
                          UnregistrationParams)
- 
-# from __future__ import absolute_import, division, print_function, unicode_literals
-from .model.text_generation import Completion
+# modal
 
+# modal
+# from __future__ import absolute_import, division, print_function, unicode_literals
+# from .model.text_generation import Completion
+from .model.RNNmodel import generate_text
 COUNT_DOWN_START_IN_SECONDS = 10
 COUNT_DOWN_SLEEP_IN_SECONDS = 1
 context = ""
 check = 0
+# modal
 
+
+# modal
 class AILanguageServer(LanguageServer):
     CMD_COUNT_DOWN_BLOCKING = 'countDownBlocking'
     CMD_COUNT_DOWN_NON_BLOCKING = 'countDownNonBlocking'
@@ -104,8 +109,8 @@ def did_change(ls, params: DidChangeTextDocumentParams):
     print("change_world---:{}".format(change_world))
     global context
     # context = Completion(change_world)
-    context = test(change_world)
-    print("contexts---:{}".format(context))
+    context = generate_text(change_world)
+    ls.show_message_log("contexts---:{}".format(context))
 
 @AI_coder.feature(TEXT_DOCUMENT_DID_CLOSE)
 def did_close(server: AILanguageServer, params: DidCloseTextDocumentParams):
@@ -164,5 +169,5 @@ async def unregister_completions(ls: AILanguageServer, *args):
                         MessageType.Error)
 
 if __name__ == '__main__':
-    text = Completion("text")
+    text = generate_text("text")
     print(text)

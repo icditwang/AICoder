@@ -9,5 +9,6 @@ if __name__ == "__main__":
     # print(chr(36))
     # for i in range(33,127):
     #     print(i," ",chr(i))
-    a = [chr(i) for i in range(33,127)]
+    a = [chr(i) for i in range(32,127)]
+    b = [""]
     print(a)
