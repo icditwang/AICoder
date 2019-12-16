@@ -11,4 +11,4 @@ if __name__ == "__main__":
     #     print(i," ",chr(i))
     a = [chr(i) for i in range(32,127)]
     b = [""]
-    print(a)
+    print

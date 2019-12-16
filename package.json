@@ -4,7 +4,7 @@
   "author": "Open Law Library",
   "repository": "https://github.com/icditwang/AICoder",
   "license": "Apache-2.0",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "icditwang",
   "engines": {
     "vscode": "^1.33.1"

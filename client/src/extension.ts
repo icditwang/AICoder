@@ -87,7 +87,7 @@ export function activate(context: ExtensionContext) {
       throw new Error("`python.pythonPath` is not set");
     }
 
-    client = startLangServer(pythonPath, ["-m", "server"], cwd);
+    client = startLangServer(pythonPath, ["-m", "server"], cwd); // 服务端由客户端启动
   }
 
   context.subscriptions.push(client.start());

@@ -58,6 +58,7 @@ class AILanguageServer(LanguageServer):
 
 AI_coder = AILanguageServer()
 
+#响应client的completion请求
 @AI_coder.feature(COMPLETION, trigger_characters=[chr(i) for i in range(33,127)])
 def completions(ls,params: CompletionParams = None):
     """Returns completion items."""
@@ -66,34 +67,33 @@ def completions(ls,params: CompletionParams = None):
     global context
     global check
     print("check_contexts:{}".format(context))
+    #返回补全的内容
     return CompletionList(False, [
-        #CompletionItem(context),
         CompletionItem(label='aicoder',detail="AICoder",documentation='aicoder'),
-        # CompletionItem('world'),
-        CompletionItem('test_AICoder',detail="AICoder",documentation='test_AICoder'),
+        CompletionItem(abel='test_AICoder',detail="AICoder",documentation='test_AICoder'),
         CompletionItem(label=context,detail="AICoder",documentation=context)
     ])
+#获取当前输入的单词
 def get_change_word(txt,i):
     p = i
     while p>=0 and txt[p] != " ":
         p -= 1
     return txt[p+1:i+1]
-def test(word):
-    return word+"test"
+#文档改变事件
 @AI_coder.feature(TEXT_DOCUMENT_DID_CHANGE)
 def did_change(ls, params: DidChangeTextDocumentParams):
     """Text document did change notification."""
     print("did_change")
     ls.show_message_log('did_change')
     file_change_content = params.contentChanges[0].text
-    change_start_position = []
-    change_end_position = []
+    change_start_position = []  #光标位置-输入前
+    change_end_position = []    #光标位置-输入后
     change_start_position.append(params.contentChanges[0].range.start.line)
     change_start_position.append(params.contentChanges[0].range.start.character)
     change_end_position.append(params.contentChanges[0].range.end.line)
     change_end_position.append(params.contentChanges[0].range.end.character)
-    text_doc = ls.workspace.get_document(params.textDocument.uri)
-    file_content = text_doc.source
+    text_doc = ls.workspace.get_document(params.textDocument.uri)   
+    file_content = text_doc.source  #文档全文
     print("change_position: {},{},{},{}".format(change_start_position[0],change_start_position[1],change_end_position[0],change_end_position[1]))
     split = file_content.split('\n')
     changed_line_content = split[change_start_position[0]]
@@ -109,15 +109,15 @@ def did_change(ls, params: DidChangeTextDocumentParams):
     print("change_world---:{}".format(change_world))
     global context
     # context = Completion(change_world)
-    context = generate_text(change_world)
+    context = generate_text(change_world)   #模型补全的内容
     ls.show_message_log("contexts---:{}".format(context))
-
+#文档关闭事件
 @AI_coder.feature(TEXT_DOCUMENT_DID_CLOSE)
 def did_close(server: AILanguageServer, params: DidCloseTextDocumentParams):
     """Text document did close notification."""
     server.show_message('Text Document Did Close')
 
-
+#文档打开事件
 @AI_coder.feature(TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls, params: DidOpenTextDocumentParams):
     """Text document did open notification."""
@@ -125,6 +125,7 @@ async def did_open(ls, params: DidOpenTextDocumentParams):
     # _validate(ls, params)
 
 
+#command修饰器为注册命令
 @AI_coder.command(AILanguageServer.CMD_REGISTER_COMPLETIONS)
 async def register_completions(ls: AILanguageServer, *args):
     """Register completions method on the client."""
@@ -170,4 +171,4 @@ async def unregister_completions(ls: AILanguageServer, *args):
 
 if __name__ == '__main__':
     text = generate_text("text")
-    print(text)
+    print(text) 
